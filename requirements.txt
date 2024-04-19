@@ -2,3 +2,6 @@ python-crontab==3.0.0
 docker
 JPype1
 confluent-kafka
+joblib
+pandas
+scikit-learn==1.2.2
