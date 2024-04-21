@@ -2,6 +2,8 @@ import jpype
 from jpype import JClass, JString
 
 jpype.startJVM()
+
+
 def get_kafka_metrics(topic_name):
     metrics = {}
     JMXServiceURL = JClass("javax.management.remote.JMXServiceURL")
@@ -42,32 +44,33 @@ def get_kafka_metrics(topic_name):
         for a in info.getAttributes():
 
             if a.getName() == "HeapMemoryUsage" or a.getName() == "NonHeapMemoryUsage":
-                print(
-                    "name",
-                    a.getName(),
-                    "used",
-                    mbsc.getAttribute(ObjectName(mbean), JString(a.getName())).get("used"),
-                )
+                used_value = mbsc.getAttribute(
+                    ObjectName(mbean), JString(a.getName())
+                ).get("used")
+                max_value = mbsc.getAttribute(
+                    ObjectName(mbean), JString(a.getName())
+                ).get("max")
+                print("name", a.getName(), "used", used_value)
                 print(
                     "name",
                     a.getName(),
                     "max",
-                    mbsc.getAttribute(ObjectName(mbean), JString(a.getName())).get("max"),
+                    max_value,
                 )
 
                 metrics[mbean][JString(a.getName())] = {
-                   "used":  str(mbsc.getAttribute(ObjectName(mbean), JString(a.getName())).get("used")),
-                    "max": str(mbsc.getAttribute(ObjectName(mbean), JString(a.getName())).get("max")),
+                    "used": str(used_value),
+                    "max": str(max_value),
                 }
 
             else:
+                value = mbsc.getAttribute(ObjectName(mbean), str(JString(a.getName())))
                 print(
                     "name",
                     a.getName(),
-                    mbsc.getAttribute(ObjectName(mbean), str(JString(a.getName()))),
+                    value,
                 )
-                metrics[str(mbean)][JString(a.getName())] = str(mbsc.getAttribute(ObjectName(mbean), str(JString(a.getName())))
-                                                                )
+                metrics[str(mbean)][JString(a.getName())] = value
         print("=================================")
     jmxConnector.close()
     # Shutdown JVM
