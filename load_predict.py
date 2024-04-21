@@ -14,25 +14,25 @@ def load_model(load_path):
 
 def create_dataframe(data):
     data = {
-        "cpu_usage": float(data["java.lang:type=OperatingSystem"]["SystemLoadAverage"])
-        / float(data["java.lang:type=OperatingSystem"]["AvailableProcessors"]),
-        "memory_usage": float(data["java.lang:type=Memory"]["HeapMemoryUsage"]["used"]),
-        "time_duration": (
-            float(
-                data[
-                    "kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce"
-                ]["Count"]
-            )
-            + float(
-                data[
-                    "kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer"
-                ]["Count"]
-            )
-        )
-        / 1000,  # time is in ms
-        "memory_accesses_per_instruction": float(
-            data["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec"]["Count"]
-        ),
+        "cpu_usage": float(data["java.lang:type=OperatingSystem"]["ProcessCpuLoad"]),
+        "memory_usage": float(data["java.lang:type=Memory"]["HeapMemoryUsage"]["used"])
+        / float(data["java.lang:type=Memory"]["HeapMemoryUsage"]["max"]),
+        # "time_duration": (
+        #     float(
+        #         data[
+        #             "kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce"
+        #         ]["Count"]
+        #     )
+        #     + float(
+        #         data[
+        #             "kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer"
+        #         ]["Count"]
+        #     )
+        # )
+        # / 1000,  # time is in ms
+        # "memory_accesses_per_instruction": float(
+        #     data["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec"]["Count"]
+        # ),
     }
     dataframe = pd.DataFrame(data, index=[0])
     return dataframe
