@@ -21,7 +21,7 @@ output=$(/bin/kafka-reassign-partitions --bootstrap-server $bootstrap_server \
                                         --broker-list "$broker_list" \
                                         --generate)
 
-proposed_json=$(echo "$output" | sed -n '/Proposed partition reassignment configuration/{:a;n;/^}/!ba;p}')
+proposed_json=$(echo "$output" | awk '/Proposed partition reassignment configuration/{flag=1; next} /Current partition replica assignment/{flag=0} flag')
 
 echo "$proposed_json" > reassignment.json
 
