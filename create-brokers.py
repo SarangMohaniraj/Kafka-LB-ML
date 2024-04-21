@@ -33,14 +33,14 @@ def get_kafka_advertised_listeners(new_broker_id, new_port):
         + str(new_broker_id)
         + ":1"
         + str(new_port)
-        + ",EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:"
+        + ",EXTERNAL://localhost:"
         + str(new_port)
         + ",DOCKER://host.docker.internal:2"
         + str(new_port)
     )
 
 
-def create_kafka_broker(broker_config, network_name, compose_project_name):
+def create_kafka_broker(broker_config, network_name):
     client = docker.from_env()
     zookeeper_connect = broker_config["zookeeper_connect"]
     new_broker_id = broker_config["new_broker_id"]
@@ -69,7 +69,7 @@ def create_kafka_broker(broker_config, network_name, compose_project_name):
     }
 
     # Adjust the port mapping based on your requirements
-    port_mapping = {"9092/tcp": new_port}
+    port_mapping = {f"{new_port}": f"{new_port}", f"2{new_port}": f"2{new_port}"}
 
     # Create and start the Kafka broker container
     container = client.containers.create(
@@ -77,7 +77,7 @@ def create_kafka_broker(broker_config, network_name, compose_project_name):
         environment=environment,
         ports=port_mapping,
         detach=True,
-        name=f"{compose_project_name}_kafka_{new_broker_id}",
+        name=f"kafka{new_broker_id}",
     )
 
     network = client.networks.get(network_name)
@@ -89,4 +89,4 @@ def create_kafka_broker(broker_config, network_name, compose_project_name):
 
 broker_config = get_new_broker_config()
 # Example: Create and start an additional broker
-create_kafka_broker(broker_config, network_name="dynamic-lb-kafka_default", compose_project_name="dynamic-lb-kafka")
+create_kafka_broker(broker_config, network_name="dynamic-lb-kafka_default")
