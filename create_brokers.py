@@ -1,21 +1,15 @@
 import docker
 import json
+from cluster_props_handler import get_cluster_properties, update_cluster_properties
 
 
-def get_cluster_properties(properties_path="config/cluster-properties.json"):
-    with open(properties_path) as f:
-        cluster_properties = json.load(f)
-        return cluster_properties
-
-
-def get_new_broker_config():
-    cluster_properties = get_cluster_properties()
+def get_new_broker_config(cluster_properties):
     zookeeper_connect = ",".join(cluster_properties["zookeeper_servers"])
     new_broker_id = (
         max([int(broker["id"]) for broker in cluster_properties["brokers"]]) + 1
     )
     new_port = (
-        max([int(broker["port"]) for broker in cluster_properties["brokers"]]) + 1
+        max([int(broker["default_port"]) for broker in cluster_properties["brokers"]]) + 1
     )
     replication_factor = 1
     print("new_port", new_port)
@@ -40,7 +34,7 @@ def get_kafka_advertised_listeners(new_broker_id, new_port):
     )
 
 
-def create_kafka_broker(broker_config, network_name):
+def create_kafka_broker(broker_config,cluster_properties, network_name):
     client = docker.from_env()
     zookeeper_connect = broker_config["zookeeper_connect"]
     new_broker_id = broker_config["new_broker_id"]
@@ -81,12 +75,26 @@ def create_kafka_broker(broker_config, network_name):
     )
 
     network = client.networks.get(network_name)
-    network.connect(container, aliases=[f"kafka_{new_broker_id}"])
+    network.connect(container, aliases=[f"kafka{new_broker_id}"])
     container.start()
 
+    cluster_properties["brokers_servers"].append(f"localhost:{new_port}")
+    cluster_properties["brokers"].append({
+        "server": f"kafka{new_broker_id}:{new_port}",
+        "id": new_broker_id,
+        "hostname": f"kafka{new_broker_id}",
+        "ports": port_mapping,
+        "environment": environment,
+        "default_port": f"{new_port}"
+    })
     print(f"Broker {new_broker_id} started, accessible on localhost:{new_port}")
+    return cluster_properties
 
 
-broker_config = get_new_broker_config()
+properties_path = "config/cluster-properties.json"
+cluster_properties = get_cluster_properties(properties_path)
+broker_config = get_new_broker_config(cluster_properties)
 # Example: Create and start an additional broker
-create_kafka_broker(broker_config, network_name="dynamic-lb-kafka_default")
+new_cluster_properties = create_kafka_broker(broker_config,cluster_properties, network_name="dynamic-lb-kafka_default")
+update_cluster_properties(new_cluster_properties)
+
