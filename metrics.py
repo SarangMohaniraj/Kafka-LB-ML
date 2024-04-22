@@ -4,7 +4,7 @@ from jpype import JClass, JString
 jpype.startJVM()
 
 
-def get_kafka_metrics(topic_name):
+def get_kafka_metrics():
     metrics = {}
     JMXServiceURL = JClass("javax.management.remote.JMXServiceURL")
     JMXConnectorFactory = JClass("javax.management.remote.JMXConnectorFactory")
@@ -30,7 +30,7 @@ def get_kafka_metrics(topic_name):
         "kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec",
         "kafka.server:type=BrokerTopicMetrics,name=TotalProduceRequestsPerSec",
         # f"kafka.log:type=Log,name=Size,topic={topic_name},partition=7",
-        f"kafka.log:type=Log,name=NumLogSegments,topic={topic_name},partition=1",
+        # f"kafka.log:type=Log,name=NumLogSegments,topic={topic_name},partition=1",
         "kafka.server:type=Request",
         # "kafka.server:type=raft-metrics,name=poll-idle-ratio-avg",
         # f"kafka.server:type=BrokerTopicMetrics,name=RemoteLogSizeBytes,topic={topic_name}",

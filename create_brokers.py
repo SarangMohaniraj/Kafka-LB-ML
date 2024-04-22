@@ -34,7 +34,8 @@ def get_kafka_advertised_listeners(new_broker_id, new_port):
     )
 
 
-def create_kafka_broker(broker_config,cluster_properties, network_name):
+def create_kafka_broker(cluster_properties, network_name):
+    broker_config = get_new_broker_config(cluster_properties)
     client = docker.from_env()
     zookeeper_connect = broker_config["zookeeper_connect"]
     new_broker_id = broker_config["new_broker_id"]
@@ -91,10 +92,10 @@ def create_kafka_broker(broker_config,cluster_properties, network_name):
     return cluster_properties
 
 
-properties_path = "config/cluster-properties.json"
-cluster_properties = get_cluster_properties(properties_path)
-broker_config = get_new_broker_config(cluster_properties)
-# Example: Create and start an additional broker
-new_cluster_properties = create_kafka_broker(broker_config,cluster_properties, network_name="dynamic-lb-kafka_default")
-update_cluster_properties(new_cluster_properties)
-
+if __name__ == "__main__":
+    properties_path = "config/cluster-properties.json"
+    cluster_properties = get_cluster_properties(properties_path)
+    broker_config = get_new_broker_config(cluster_properties)
+    # Example: Create and start an additional broker
+    new_cluster_properties = create_kafka_broker(cluster_properties, network_name="dynamic-lb-kafka_default")
+    update_cluster_properties(new_cluster_properties)

@@ -14,8 +14,15 @@ IFS=',' read -ra topics <<< "$topic_names"
 echo '{
   "topics": [' > change_topics.json
 
-for topic in "${topics[@]}"; do
+len=${#topics[@]}
+
+for (( i=0; i<$len; i++ )); do
+    topic=${topics[$i]}
+  if [ $((i+1)) -eq $len ]; then
+    echo '    {"topic": "'"$topic"'"}' >> change_topics.json
+  else
     echo '    {"topic": "'"$topic"'"},' >> change_topics.json
+  fi
 done
 
 echo '  ],

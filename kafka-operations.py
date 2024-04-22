@@ -13,5 +13,6 @@ def create_topic(topic_name, num_partitions=3, rf=2):
             print("Topic {} created".format(topic))
         except Exception as e:
             print("Failed to create topic {}: {}".format(topic, e))
-    
-create_topic("topic1",2,2)
+
+if __name__ == "__main__":
+    create_topic("topic2",2,2)
