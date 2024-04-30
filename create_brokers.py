@@ -12,7 +12,6 @@ def get_new_broker_config(cluster_properties):
         max([int(broker["default_port"]) for broker in cluster_properties["brokers"]]) + 1
     )
     replication_factor = 1
-    print("new_port", new_port)
     return {
         "zookeeper_connect": zookeeper_connect,
         "new_broker_id": new_broker_id,
@@ -36,7 +35,7 @@ def get_kafka_advertised_listeners(new_broker_id, new_port):
 
 def create_kafka_broker(cluster_properties, network_name):
     broker_config = get_new_broker_config(cluster_properties)
-    client = docker.from_env()
+    client = docker.DockerClient(base_url='unix://var/run/docker.sock', timeout=300)
     zookeeper_connect = broker_config["zookeeper_connect"]
     new_broker_id = broker_config["new_broker_id"]
     new_port = broker_config["new_port"]
@@ -73,6 +72,7 @@ def create_kafka_broker(cluster_properties, network_name):
         ports=port_mapping,
         detach=True,
         name=f"kafka{new_broker_id}",
+        # timeout=300
     )
 
     network = client.networks.get(network_name)

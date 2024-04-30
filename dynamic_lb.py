@@ -5,13 +5,12 @@ from create_brokers import create_kafka_broker
 from reasssign import reassign_partitions
 from confluent_kafka.admin import AdminClient
 
-# from kafka.admin import KafkaAdminClient
-
-def dynamic_load_balancing():
+def predict_load_state_by_kafka_metrics():
    kafka_metrics = get_kafka_metrics()
-   print("kafka_metrics", kafka_metrics)
    load_state = predict_load_state(kafka_metrics)
-   print("load_state", load_state)
+   return load_state
+
+def dynamic_load_balancing(load_state):
    match load_state:
       case 'under-loaded':
          print("Under loaded, keep monitoring")
@@ -21,7 +20,7 @@ def dynamic_load_balancing():
          # Create additional broker to handle the load
          properties_path = "config/cluster-properties.json"
          cluster_properties = get_cluster_properties(properties_path)
-         new_cluster_properties = create_kafka_broker(cluster_properties, network_name="kafka-lb-ml_default")
+         new_cluster_properties = create_kafka_broker(cluster_properties, network_name="dynamic-lb-kafka_default")
          update_cluster_properties(new_cluster_properties)
 
          # Reassign the partitions
@@ -37,9 +36,3 @@ def get_kafka_topics(cluster_properties):
    for topic in topics:
       topic_names.append(topic)
    return topic_names
-
-# properties_path = "config/cluster-properties.json"
-# cluster_properties = get_cluster_properties(properties_path)
-# topics = get_kafka_topics(cluster_properties)
-# print("topics", topics)
-# dynamic_load_balancing()

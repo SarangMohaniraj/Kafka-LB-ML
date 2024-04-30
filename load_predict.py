@@ -17,22 +17,22 @@ def create_dataframe(data):
         "cpu_usage": float(data["java.lang:type=OperatingSystem"]["ProcessCpuLoad"]),
         "memory_usage": float(data["java.lang:type=Memory"]["HeapMemoryUsage"]["used"])
         / float(data["java.lang:type=Memory"]["HeapMemoryUsage"]["max"]),
-        # "time_duration": (
-        #     float(
-        #         data[
-        #             "kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce"
-        #         ]["Count"]
-        #     )
-        #     + float(
-        #         data[
-        #             "kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer"
-        #         ]["Count"]
-        #     )
-        # )
-        # / 1000,  # time is in ms
-        # "memory_accesses_per_instruction": float(
-        #     data["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec"]["Count"]
-        # ),
+        "time_duration": (
+            float(
+                data[
+                    "kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce"
+                ]["Count"]
+            )
+            + float(
+                data[
+                    "kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer"
+                ]["Count"]
+            )
+        )
+        / 1000,  # time is in ms
+        "memory_accesses_per_instruction": float(
+            data["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec"]["Count"]
+        ),
     }
     dataframe = pd.DataFrame(data, index=[0])
     return dataframe

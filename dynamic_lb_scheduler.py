@@ -1,22 +1,22 @@
 import schedule
 import time
-from dynamic_lb import dynamic_load_balancing
+from dynamic_lb import dynamic_load_balancing, predict_load_state_by_kafka_metrics
 
 def job():
-    print("I'm working...")
+    print("I'm alive...")
+
+load_state_historical_data = []
+
+def load_balancing():
+    global load_state_historical_data
+    load_state_historical_data.append(predict_load_state_by_kafka_metrics())
+    if len(load_state_historical_data)>5:
+        load_state = max(load_state_historical_data,key=load_state_historical_data.count)
+        dynamic_load_balancing(load_state=load_state)
+        load_state_historical_data = []
 
 schedule.every(10).seconds.do(job)
-schedule.every(1).minutes.do(dynamic_load_balancing)
-# schedule.every().hour.do(job)
-# schedule.every().day.at("10:30").do(job)
-# schedule.every(5).to(10).minutes.do(job)
-# schedule.every().monday.do(job)
-# schedule.every().wednesday.at("13:15").do(job)
-# schedule.every().day.at("12:42", "Europe/Amsterdam").do(job)
-# schedule.every().minute.at(":17").do(job)
-
-# def job_with_argument(name):
-#     print(f"I am {name}")
+schedule.every(10).seconds.do(load_balancing)
 
 # schedule.every(10).seconds.do(job_with_argument, name="Peter")
 
