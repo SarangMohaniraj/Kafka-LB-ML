@@ -40,17 +40,17 @@ This application uses machine learning techniques to dynamically balance loads a
    ```
 
 # Evaluation
-OpenMessaging Benchmark Framework is used to rigorously test throughput and performance, ensuring the system's effectiveness under various operational conditions. To understand how intelligent load balancing is working against base kafka cluster. First we analyse the performance of base kakfa cluster vs the performance of kafka cluster integrated with intelligent load balancing
+The OpenMessaging Benchmark Framework rigorously tests throughput and performance to ensure the system's effectiveness under various operational conditions. To evaluate how intelligent load balancing compares to a traditional Kafka cluster, we analyze the performance of a standard Kafka cluster against that of a Kafka cluster enhanced with intelligent load balancing.
 1. Clone the openmessaging benchmark repo
    ```
    git clone https://github.com/openmessaging/openmessaging-benchmark
    ```
 
-2. Analyse performance of base kafka cluster
+2. Analyse performance of base kafka cluster using the workload of your choice.
    ```
    sudo bin/benchmark --drivers driver-kafka/kafka-throughput.yaml workloads/100-topic-1kb-4p-4c-500k.yaml
    ```
-   Rename the generated report file as baseline-report.json
+   Rename the generated report file as `baseline-report.json`
 
 3. Start the Kafka Cluster integrated with intelligent load balancing following instructions in Local setup
 
@@ -58,7 +58,7 @@ OpenMessaging Benchmark Framework is used to rigorously test throughput and perf
    ```
    sudo bin/benchmark --drivers driver-kafka/kafka-throughput.yaml workloads/100-topic-1kb-4p-4c-500k.yaml
    ```
-   Rename the generated report file as ml-report.json
+   Rename the generated report file as `ml-report.json`
 
 5. Compare the reports by generating charts using the below command
    ```
