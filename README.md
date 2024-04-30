@@ -45,17 +45,21 @@ OpenMessaging Benchmark Framework is used to rigorously test throughput and perf
    ```
    git clone https://github.com/openmessaging/openmessaging-benchmark
    ```
+
 2. Analyse performance of base kafka cluster
    ```
    sudo bin/benchmark --drivers driver-kafka/kafka-throughput.yaml workloads/100-topic-1kb-4p-4c-500k.yaml
    ```
    Rename the generated report file as baseline-report.json
+
 3. Start the Kafka Cluster integrated with intelligent load balancing following instructions in Local setup
+
 4. Analyse performance of kafka cluster integrated with our model
    ```
    sudo bin/benchmark --drivers driver-kafka/kafka-throughput.yaml workloads/100-topic-1kb-4p-4c-500k.yaml
    ```
    Rename the generated report file as ml-report.json
+
 5. Compare the reports by generating charts using the below command
    ```
    python bin/create_charts.py baseline-report.json ml-report.json
